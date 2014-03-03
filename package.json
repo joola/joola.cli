@@ -17,13 +17,10 @@
     }
   ],
   "scripts": {
-    "test": "make test",
     "coveralls": "make coveralls"
   },
   "dependencies": {
     "joola.io.sdk": "*",
-    "celeri": "^0.3.3",
-    "cli": "^0.4.5",
     "repl.history": "^0.1.1",
     "commander": "^2.1.0",
     "prettyjson": "^0.12.0"
