@@ -1,4 +1,4 @@
-# joola.io.cli [![Build Status][3]][4] [![Coverage Status][1]][2]
+# joola.io.cli [![Build Status][3]][4]
 
 #### CLI client for joola.io
 
