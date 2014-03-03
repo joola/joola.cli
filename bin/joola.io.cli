@@ -1,19 +1,48 @@
 #!/usr/bin/env node
 
 var
+  fs = require('fs'),
+  path = require('path'),
   program = require('commander'),
   repl = require('repl'),
-  prettyjson = require('prettyjson'),
+  util = require('util'),
 
   version = require('./../package.json').version,
   joolaio = global.joolaio = require('joola.io.sdk');
+
+var configPath = path.join(__dirname, '../config.json');
+if (fs.existsSync(configPath)) {
+  var config = require(configPath);
+  Object.keys(config).forEach(function (key) {
+    program[key] = config[key];
+  });
+}
 
 program
   .version(version)
   .option('-h, --host [http://localhost:8080]', 'joola.io host (http://hostname:port)', 'http://localhost:8080')
   .option('-u, --username [username]', 'username for login with joola.io')
   .option('-p, --password [password]', 'password for login with joola.io')
-  .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
+  .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password');
+
+program
+  .command('get')
+  .description('get config value')
+  .action(function (key) {
+    console.log(key, program[key]);
+    process.exit();
+  });
+
+program
+  .command('set')
+  .description('set config value')
+  .action(function (key, value) {
+    program[key] = value;
+    if (!config)
+      config = {};
+    config[key] = value;
+    fs.writeFileSync(configPath, JSON.stringify(config));
+  });
 
 program.parse(process.argv);
 
@@ -48,34 +77,58 @@ else {
 
 
 var startCLI = function () {
-  console.log('Connected to joola.io.');
-  var exit = function () {
-    process.exit();
-  };
+  console.log('');
 
-  var quit = function () {
-    process.exit();
-  };
+  var self = this;
+  ['q', 'exit', 'quit'].forEach(function (key) {
+    self.__defineGetter__(key, function () {
+      process.exit();
+    });
+  });
+
+  this.__defineGetter__('help', function () {
+    var helptext = {};
+
+    var inspect = joolaio.api.describe;
+    if (inspect) {
+      Object.keys(inspect).forEach(function (key) {
+        var elem = inspect[key];
+        helptext[key] = {};
+        Object.keys(elem).forEach(function (elemKey) {
+          var attribute = elem[elemKey];
+          helptext[key][elemKey] = {
+            endpoint: attribute.name,
+            description: attribute.description,
+            params: attribute.inputs
+          }
+        });
+      });
+      console.log(util.inspect(helptext, {depth: null, colors: true}));
+    }
+    else
+      console.error(what + ' unknown');
+  });
 
   var _repl = repl.start({
-    prompt: 'joola.io @ ' + program.host.replace('http://', '').replace('https://', '') + ' > ',
+    prompt: 'joola.io ' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + ' > ',
     input: process.stdin,
     output: process.stdout,
     useGlobal: true,
     eval: function (cmd, context, filename, callback) {
       try {
         var result;
-        if (cmd.indexOf('joolaio.') > -1) {
+        cmd = cmd.substring(1, cmd.length - 2);
+        if (cmd.indexOf('joolaio.') > -1 && cmd.indexOf('(') > -1) {
           var fn = function (err, result) {
             return callback(err, result);
-            /*if (err)
-             return process.stdout.write('Error: ' + err + '\n');
-
-             return process.stdout.write(prettyjson.render(result) + '\n');*/
           };
-
           var inject = fn.toString();
-          cmd = cmd.substring(1, cmd.length - 2).replace(')', ',' + inject + ')');
+          if (cmd.indexOf(',') > -1)
+            cmd = cmd.replace(')', ',' + inject + ')');
+          else if (cmd.indexOf('()') > -1)
+            cmd = cmd.replace(')', inject + ')');
+          else
+            cmd = cmd.replace(')', ',' + inject + ')');
           eval(cmd);
         }
         else {

@@ -11,7 +11,7 @@ test:
 		@NODE_ENV=test ./node_modules/.bin/mocha --reporter $(REPORTER)
 
 lint:
-		@./node_modules/.bin/jshint ./lib ./test
+		@./node_modules/.bin/jshint ./bin
 
 test-cov:	
 		$(MAKE) istanbul

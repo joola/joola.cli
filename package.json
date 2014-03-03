@@ -23,10 +23,9 @@
     "joola.io.cli": "./bin/joola.io.cli"
   },
   "dependencies": {
-    "joola.io.sdk": "*",
+    "joola.io.sdk": "http://github.com/joola/joola.io.sdk/tarball/develop",
     "repl.history": "^0.1.1",
-    "commander": "^2.1.0",
-    "prettyjson": "^0.12.0"
+    "commander": "^2.1.0"
   },
   "devDependencies": {
     "coveralls": "*",

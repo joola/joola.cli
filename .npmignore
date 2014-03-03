@@ -5,3 +5,4 @@ lib-cov
 coverage
 .idea
 .*
+/joolaio_repl_history
