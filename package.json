@@ -19,6 +19,9 @@
   "scripts": {
     "coveralls": "make coveralls"
   },
+  "bin": {
+    "joola.io.cli": "./bin/joola.io.cli"
+  },
   "dependencies": {
     "joola.io.sdk": "*",
     "repl.history": "^0.1.1",

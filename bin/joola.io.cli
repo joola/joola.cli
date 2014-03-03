@@ -1,10 +1,11 @@
+#!/usr/bin/env node
+
 var
-  colors = require('colour'),
   program = require('commander'),
   repl = require('repl'),
   prettyjson = require('prettyjson'),
 
-  version = require('./package.json').version,
+  version = require('./../package.json').version,
   joolaio = global.joolaio = require('joola.io.sdk');
 
 program
@@ -13,27 +14,6 @@ program
   .option('-u, --username [username]', 'username for login with joola.io')
   .option('-p, --password [password]', 'password for login with joola.io')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
-
-program
-  .command('setup')
-  .description('run remote setup commands')
-  .action(function () {
-    console.log('setup');
-  });
-
-program
-  .command('exec <cmd>')
-  .description('run the given remote command')
-  .action(function (cmd) {
-    console.log('exec "%s"', cmd);
-  });
-
-program
-  .command('*')
-  .description('deploy the given env')
-  .action(function (env) {
-    console.log('deploying "%s"', env);
-  });
 
 program.parse(process.argv);
 
