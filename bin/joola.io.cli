@@ -42,6 +42,7 @@ program
       config = {};
     config[key] = value;
     fs.writeFileSync(configPath, JSON.stringify(config));
+    process.exit();
   });
 
 program.parse(process.argv);
@@ -65,6 +66,7 @@ else if (program.username && program.password) {
     joolaio.users.authenticate('joola', program.username, program.password, function (err, token) {
       if (err)
         throw err;
+      joolaio.USER = token.user;
       joolaio.TOKEN = token;
       startCLI();
     });
