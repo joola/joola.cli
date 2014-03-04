@@ -23,7 +23,8 @@ program
   .option('-h, --host [http://localhost:8080]', 'joola.io host (http://hostname:port)', 'http://localhost:8080')
   .option('-u, --username [username]', 'username for login with joola.io')
   .option('-p, --password [password]', 'password for login with joola.io')
-  .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password');
+  .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
+  .option('-e, --eval [script]', 'javascript to execute and close');
 
 program
   .command('get')
@@ -130,7 +131,8 @@ var startCLI = function () {
     eval: function (cmd, context, filename, callback) {
       try {
         var result;
-        cmd = cmd.substring(1, cmd.length - 2);
+        if (cmd.substring(0, 1) === '(')
+          cmd = cmd.substring(1, cmd.length - 2);
         if (cmd.indexOf('joolaio.') > -1 && cmd.indexOf('(') > -1) {
           var fn = function (err, result) {
             return callback(err, result);
@@ -142,6 +144,7 @@ var startCLI = function () {
             cmd = cmd.replace(')', inject + ')');
           else
             cmd = cmd.replace(')', ',' + inject + ')');
+
           eval(cmd);
         }
         else {
@@ -160,4 +163,10 @@ var startCLI = function () {
     }
   });
   require('repl.history')(_repl, 'joolaio_repl_history');
+  if (program.eval) {
+    _repl.eval(program.eval, null, null, function (err, result) {
+      console.log(util.inspect(result, {depth: null, colors: true}));
+      exit();
+    });
+  }
 };
