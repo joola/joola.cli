@@ -24,7 +24,8 @@ program
   .option('-u, --username [username]', 'username for login with joola.io')
   .option('-p, --password [password]', 'password for login with joola.io')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
-  .option('-e, --eval [script]', 'javascript to execute and close');
+  .option('-e, --eval [script]', 'javascript to execute and exit')
+  .option('-f, --file [filename]', 'javascript file to execute and exit');
 
 program
   .command('get')
@@ -145,6 +146,7 @@ var startCLI = function () {
           else
             cmd = cmd.replace(')', ',' + inject + ')');
 
+          cmd = 'try{' + cmd + '}catch(ex){console.log(ex)}';
           eval(cmd);
         }
         else {
@@ -165,6 +167,17 @@ var startCLI = function () {
   require('repl.history')(_repl, 'joolaio_repl_history');
   if (program.eval) {
     _repl.eval(program.eval, null, null, function (err, result) {
+      if (err)
+        throw err;
+      console.log(util.inspect(result, {depth: null, colors: true}));
+      exit();
+    });
+  }
+  if (program.file) {
+    var fileContents = fs.readFileSync(program.file).toString('utf8');
+    _repl.eval(fileContents, null, null, function (err, result) {
+      if (err)
+        throw err;
       console.log(util.inspect(result, {depth: null, colors: true}));
       exit();
     });
