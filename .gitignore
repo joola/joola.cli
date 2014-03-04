@@ -18,3 +18,4 @@ node_modules
 
 coverage
 /joolaio_repl_history
+/config.json
