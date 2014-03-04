@@ -27,7 +27,7 @@ program
 
 program
   .command('get')
-  .description('get config value')
+  .description('joola.io get <key>')
   .action(function (key) {
     console.log(key, program[key]);
     process.exit();
@@ -35,18 +35,30 @@ program
 
 program
   .command('set')
-  .description('set config value')
+  .description('joola.io set <key> <value>')
   .action(function (key, value) {
     program[key] = value;
     if (!config)
       config = {};
     config[key] = value;
     fs.writeFileSync(configPath, JSON.stringify(config));
+    process.exit();
+  });
+
+program
+  .command('clear')
+  .description('joola.io clear <key>')
+  .action(function (key) {
+    delete program[key]
+    if (config)
+      delete config[key];
+    fs.writeFileSync(configPath, JSON.stringify(config));
+    process.exit();
   });
 
 program.parse(process.argv);
 
-console.log('joola.io-cli (' + version + ') starting...');
+console.log('joola.io.cli (' + version + ') starting...');
 console.log('Connecting to joola.io @ ' + program.host + '...');
 
 if (program.apitoken) {
@@ -65,6 +77,7 @@ else if (program.username && program.password) {
     joolaio.users.authenticate('joola', program.username, program.password, function (err, token) {
       if (err)
         throw err;
+      joolaio.USER = token.user;
       joolaio.TOKEN = token;
       startCLI();
     });
