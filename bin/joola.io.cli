@@ -24,7 +24,8 @@ program
   .option('-u, --username [username]', 'username for login with joola.io')
   .option('-p, --password [password]', 'password for login with joola.io')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
-  .option('-e, --eval [script]', 'javascript to execute and close');
+  .option('-e, --eval [script]', 'javascript to execute and close')
+  .option('-d, --debug', 'print out debug messages');
 
 program
   .command('get')
@@ -63,7 +64,7 @@ console.log('joola.io.cli (' + version + ') starting...');
 console.log('Connecting to joola.io @ ' + program.host + '...');
 
 if (program.apitoken) {
-  joolaio.init({APIToken: program.apitoken, host: program.host, debug: {enabled: false}}, function (err) {
+  joolaio.init({APIToken: program.apitoken, host: program.host, debug: {enabled: program.debug || false}}, function (err) {
     if (err)
       throw err;
 
@@ -71,7 +72,7 @@ if (program.apitoken) {
   });
 }
 else if (program.username && program.password) {
-  joolaio.init({host: program.host, debug: {enabled: false}}, function (err) {
+  joolaio.init({host: program.host, debug: {enabled: program.debug || false}}, function (err) {
     if (err)
       throw err;
 
@@ -146,7 +147,6 @@ var startCLI = function () {
             cmd = cmd.replace(')', ',' + inject + ')');
 
           cmd = 'try{' + cmd + '}catch(ex){console.log(ex)}';
-
           eval(cmd);
         }
         else {
