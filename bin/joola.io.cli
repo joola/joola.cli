@@ -125,7 +125,7 @@ var startCLI = function () {
   });
 
   var _repl = repl.start({
-    prompt: 'joola.io ' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + ' > ',
+    prompt: 'joola.io ' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ',
     input: process.stdin,
     output: process.stdout,
     useGlobal: true,
