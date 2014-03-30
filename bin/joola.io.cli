@@ -68,7 +68,9 @@ if (program.apitoken) {
     if (err)
       throw err;
 
-    startCLI();
+    joolaio.events.on('ready', function () {
+      startCLI();
+    });
   });
 }
 else if (program.username && program.password) {
@@ -81,7 +83,9 @@ else if (program.username && program.password) {
         throw err;
       joolaio.USER = token.user;
       joolaio.TOKEN = token;
-      startCLI();
+      joolaio.events.on('ready', function () {
+        startCLI();
+      });
     });
   });
 }
