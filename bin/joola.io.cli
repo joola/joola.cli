@@ -67,10 +67,6 @@ if (program.apitoken) {
   joolaio.init({APIToken: program.apitoken, host: program.host, debug: {enabled: program.debug || false}}, function (err) {
     if (err)
       throw err;
-
-    joolaio.events.on('ready', function () {
-      startCLI();
-    });
   });
 }
 else if (program.username && program.password) {
@@ -83,9 +79,7 @@ else if (program.username && program.password) {
         throw err;
       joolaio.USER = token.user;
       joolaio.TOKEN = token;
-      joolaio.events.on('ready', function () {
-        startCLI();
-      });
+
     });
   });
 }
@@ -93,6 +87,10 @@ else {
   console.error('Autentication failed, no login details provided.');
   process.exit();
 }
+
+joolaio.events.on('ready', function () {
+  startCLI();
+});
 
 
 var startCLI = function () {
