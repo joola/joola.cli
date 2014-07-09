@@ -1,6 +1,6 @@
 {
   "name": "joola.io.cli",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "author": "Itay Weinberger <itay@joo.la>",
   "description": "CLI Client for joola.io",
   "engine": "node >= 0.10.x",
@@ -23,7 +23,7 @@
     "joola.io.cli": "./bin/joola.io.cli"
   },
   "dependencies": {
-    "joola.io.sdk": "http://github.com/joola/joola.io.sdk/tarball/develop",
+    "joola.io.sdk": "^0.6.0",
     "repl.history": "^0.1.1",
     "commander": "^2.1.0"
   },
@@ -34,7 +34,7 @@
     "istanbul": "*",
     "sinon": "*",
     "chai": "*",
-    "sinon-chai": "*",
+    "sinon-chai": "2.3.1",
     "expect": "*",
     "underscore": "*",
     "jshint": "*"
