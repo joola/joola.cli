@@ -1,6 +1,6 @@
 {
   "name": "joola.cli",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Itay Weinberger <itay@joo.la>",
   "description": "CLI Client for Joola",
   "engine": "node >= 0.10.x",
