@@ -21,9 +21,9 @@ if (fs.existsSync(configPath)) {
 
 program
   .version(version)
-  .option('-h, --host [http://localhost:8080]', 'joola host (http://hostname:port)', 'http://localhost:8080')
-  .option('-u, --username [username]', 'username for login with joola')
-  .option('-p, --password [password]', 'password for login with joola')
+  .option('-h, --host [http://localhost:8080]', 'Joola host (http://hostname:port)', 'http://localhost:8080')
+  .option('-u, --username [username]', 'username for login with Joola')
+  .option('-p, --password [password]', 'password for login with Joola')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
   .option('-e, --eval [script]', 'javascript to execute and close')
   .option('-d, --debug', 'print out debug messages');
@@ -62,7 +62,7 @@ program
 program.parse(process.argv);
 
 console.log('joola.cli (' + version + ') starting...');
-console.log('Connecting to joola @ ' + program.host + '...');
+console.log('Connecting to Joola @ ' + program.host + '...');
 
 if (program.apitoken) {
   joolaio.init({APIToken: program.apitoken, host: program.host, debug: {enabled: program.debug || false}}, function (err) {
@@ -85,7 +85,7 @@ else if (program.username && program.password) {
   });
 }
 else {
-  console.error('Autentication failed, no login details provided.');
+  console.error('Authentication failed, no login details provided.');
   process.exit();
 }
 
@@ -128,7 +128,7 @@ var startCLI = function () {
   });
 
   var _repl = repl.start({
-    prompt: 'joola ' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ',
+    prompt: '' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ',
     input: process.stdin,
     output: process.stdout,
     useGlobal: true,
