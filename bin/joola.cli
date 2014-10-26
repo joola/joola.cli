@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; //allow node-request to deal with Error: DEPTH_ZERO_SELF_SIGNED_CERT
 
 var
   fs = require('fs'),
@@ -8,7 +9,7 @@ var
   util = require('util'),
 
   version = require('./../package.json').version,
-  joolaio = global.joolaio = require('joola.io.sdk');
+  joolaio = global.joolaio = require('joola.sdk');
 
 var configPath = path.join(__dirname, '../config.json');
 if (fs.existsSync(configPath)) {
@@ -20,16 +21,16 @@ if (fs.existsSync(configPath)) {
 
 program
   .version(version)
-  .option('-h, --host [http://localhost:8080]', 'joola.io host (http://hostname:port)', 'http://localhost:8080')
-  .option('-u, --username [username]', 'username for login with joola.io')
-  .option('-p, --password [password]', 'password for login with joola.io')
+  .option('-h, --host [http://localhost:8080]', 'joola host (http://hostname:port)', 'http://localhost:8080')
+  .option('-u, --username [username]', 'username for login with joola')
+  .option('-p, --password [password]', 'password for login with joola')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
   .option('-e, --eval [script]', 'javascript to execute and close')
   .option('-d, --debug', 'print out debug messages');
 
 program
   .command('get')
-  .description('joola.io get <key>')
+  .description('joola get <key>')
   .action(function (key) {
     console.log(key, program[key]);
     process.exit();
@@ -37,7 +38,7 @@ program
 
 program
   .command('set')
-  .description('joola.io set <key> <value>')
+  .description('joola set <key> <value>')
   .action(function (key, value) {
     program[key] = value;
     if (!config)
@@ -49,7 +50,7 @@ program
 
 program
   .command('clear')
-  .description('joola.io clear <key>')
+  .description('joola clear <key>')
   .action(function (key) {
     delete program[key]
     if (config)
@@ -60,8 +61,8 @@ program
 
 program.parse(process.argv);
 
-console.log('joola.io.cli (' + version + ') starting...');
-console.log('Connecting to joola.io @ ' + program.host + '...');
+console.log('joola.cli (' + version + ') starting...');
+console.log('Connecting to joola @ ' + program.host + '...');
 
 if (program.apitoken) {
   joolaio.init({APIToken: program.apitoken, host: program.host, debug: {enabled: program.debug || false}}, function (err) {
@@ -127,7 +128,7 @@ var startCLI = function () {
   });
 
   var _repl = repl.start({
-    prompt: 'joola.io ' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ',
+    prompt: 'joola ' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ',
     input: process.stdin,
     output: process.stdout,
     useGlobal: true,
@@ -136,8 +137,11 @@ var startCLI = function () {
         var result;
         if (cmd.substring(0, 1) === '(')
           cmd = cmd.substring(1, cmd.length - 2);
-        if (cmd.indexOf('joolaio.') > -1 && cmd.indexOf('(') > -1) {
+        if (cmd.indexOf('joola.') > -1 && cmd.indexOf('(') > -1) {
           var fn = function (err, result) {
+            if (cmd.indexOf('joola.query.fetch') > -1 && cmd.indexOf('(') > -1) 
+              return callback(err, result.documents);
+            
             return callback(err, result);
           };
           var inject = fn.toString();
