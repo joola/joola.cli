@@ -138,10 +138,13 @@ var startCLI = function () {
         if (cmd.substring(0, 1) === '(')
           cmd = cmd.substring(1, cmd.length - 2);
         if (cmd.indexOf('joola.') > -1 && cmd.indexOf('(') > -1) {
+          var printDocs = false;
+          if (cmd.indexOf('joola.query.fetch') > -1)
+            printDocs = true;
           var fn = function (err, result) {
-            if (cmd.indexOf('joola.query.fetch') > -1 && cmd.indexOf('(') > -1) 
+            if (printDocs)
               return callback(err, result.documents);
-            
+
             return callback(err, result);
           };
           var inject = fn.toString();

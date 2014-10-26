@@ -7,7 +7,7 @@
 ### Install
 
 ```bash
-$ npm install joola.cli -g
+$ npm install joola.cli -g --production
 $ joola.cli --host https://localhost:8081 --apitoken 12345
 ```
 
