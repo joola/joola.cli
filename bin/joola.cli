@@ -21,7 +21,7 @@ if (fs.existsSync(configPath)) {
 
 program
   .version(version)
-  .option('-h, --host [http://localhost:8080]', 'Joola host (http://hostname:port)', 'http://localhost:8080')
+  .option('-h, --host [http://localhost:8080]', 'Joola host (http://hostname:port)')
   .option('-u, --username [username]', 'username for login with Joola')
   .option('-p, --password [password]', 'password for login with Joola')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
