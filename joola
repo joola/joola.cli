@@ -8,10 +8,10 @@ var
   repl = require('repl'),
   util = require('util'),
 
-  version = require('./../package.json').version,
+  version = require('./package.json').version,
   joolaio = global.joolaio = require('joola.sdk');
 
-var configPath = path.join(__dirname, '../config.json');
+var configPath = path.join(__dirname, './config.json');
 if (fs.existsSync(configPath)) {
   var config = require(configPath);
   Object.keys(config).forEach(function (key) {
@@ -26,6 +26,8 @@ program
   .option('-p, --password [password]', 'password for login with Joola')
   .option('-a, --apitoken [apitoken]', 'APIToken to use instead of username/password')
   .option('-e, --eval [script]', 'javascript to execute and close')
+  .option('-f, --file [filename]', 'javascript file to execute and close')
+  .option('-g, --gist [url]', 'javascript gist url to execute and close')
   .option('-d, --debug', 'print out debug messages');
 
 program
@@ -61,8 +63,8 @@ program
 
 program.parse(process.argv);
 
-console.log('joola.cli (' + version + ') starting...');
-console.log('Connecting to Joola @ ' + program.host + '...');
+//console.log('joola.cli (' + version + ') starting...');
+//console.log('Connecting to Joola @ ' + program.host + '...');
 
 if (program.apitoken) {
   joolaio.init({APIToken: program.apitoken, host: program.host, debug: {enabled: program.debug || false}}, function (err) {
@@ -127,8 +129,11 @@ var startCLI = function () {
       console.error(what + ' unknown');
   });
 
+  var prompt = '' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ';
+  if (program.file || program.eval || program.gist)
+    prompt = '';
   var _repl = repl.start({
-    prompt: '' + joolaio.USER.username + '@' + program.host.replace('http://', '').replace('https://', '') + '> ',
+    prompt: prompt,
     input: process.stdin,
     output: process.stdout,
     useGlobal: true,
@@ -139,12 +144,12 @@ var startCLI = function () {
           cmd = cmd.substring(1, cmd.length - 2);
         if (cmd.indexOf('joola.') > -1 && cmd.indexOf('(') > -1) {
           var printDocs = false;
-          if (cmd.indexOf('joola.query.fetch') > -1)
+          if (cmd.indexOf('joola.query') > -1)
             printDocs = true;
           var fn = function (err, result) {
-            if (printDocs)
+            if (printDocs && result && result.documents) {
               return callback(err, result.documents);
-
+            }
             return callback(err, result);
           };
           var inject = fn.toString();
@@ -173,11 +178,40 @@ var startCLI = function () {
       }
     }
   });
-  require('repl.history')(_repl, 'joolaio_repl_history');
+  require('repl.history')(_repl, 'joola_repl_history');
   if (program.eval) {
     _repl.eval(program.eval, null, null, function (err, result) {
+      if (err)
+        throw err;
       console.log(util.inspect(result, {depth: null, colors: true}));
       exit();
+    });
+  }
+  if (program.file) {
+    var script = fs.readFileSync(program.file);
+    _repl.eval(script.toString('utf8'), null, null, function (err, result) {
+      if (err)
+        throw err;
+      console.log(util.inspect(result, {depth: null, colors: true}));
+      exit();
+    });
+  }
+  if (program.gist) {
+    var parts = url.parse(program.gist);
+    var proto = parts.protocol === 'https:' ? require('https') : require('http');
+    proto.get(program.gist, function (res) {
+      var script = '';
+      res.on('data', function (chunk) {
+        script += chunk;
+      });
+      res.on('end', function () {
+        _repl.eval(script, null, null, function (err, result) {
+          if (err)
+            throw err;
+          console.log(util.inspect(result, {depth: null, colors: true}));
+          exit();
+        });
+      });
     });
   }
 };
