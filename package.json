@@ -1,6 +1,6 @@
 {
   "name": "joola.cli",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Itay Weinberger <itay@joo.la>",
   "description": "CLI Client for Joola",
   "engine": "node >= 0.10.x",
@@ -20,10 +20,10 @@
     "coveralls": "make coveralls"
   },
   "bin": {
-    "joola.cli": "./bin/joola.cli"
+    "joola": "./joola"
   },
   "dependencies": {
-    "joola.sdk": "^0.7.0",
+    "joola.sdk": "^0.8.2",
     "repl.history": "^0.1.1",
     "commander": "^2.1.0"
   },
